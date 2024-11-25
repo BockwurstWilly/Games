@@ -3,82 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bockis Spiele Kiste</title>
+    <title>Spiele Key-Vergabe</title>
     <style>
+        :root {
+            --bg-color-light: #ffffff;
+            --text-color-light: #000000;
+            --bg-color-dark: #2e2e2e;
+            --text-color-dark: #ffffff;
+        }
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
+            margin: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
-        .hidden {
-            display: none;
+        body.light-mode {
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+        }
+        body.dark-mode {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        .key-display {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            font-weight: bold;
+        }
+        .history {
+            margin-top: 30px;
+        }
+        .history ul {
+            list-style: none;
+            padding: 0;
+        }
+        .history li {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
+</head>
+<body class="light-mode">
+    <div class="container">
+        <h1>Spiele Key-Vergabe</h1>
+        <button id="toggle-mode">Wechsel zu Dunkelmodus</button>
+
+        <form id="key-form">
+            <label for="game-select">Wähle ein Spiel:</label>
+            <select id="game-select" required>
+                <option value="" disabled selected>-- Bitte auswählen --</option>
+                <option value="game1">Spiel 1</option>
+                <option value="game2">Spiel 2</option>
+                <option value="game3">Spiel 3</option>
+            </select>
+
+            <label for="nickname">Nickname:</label>
+            <input type="text" id="nickname" placeholder="Gib deinen Nickname ein" required>
+
+            <label for="password">Passwort:</label>
+            <input type="password" id="password" placeholder="Gib das Passwort ein" required>
+
+            <button type="submit">Key anzeigen</button>
+        </form>
+
+        <div id="key-container" class="key-display" style="display: none;"></div>
+
+        <div class="history">
+            <h2>Einlösehistorie</h2>
+            <ul id="history-list"></ul>
+        </div>
+    </div>
+
     <script>
-        const PASSWORD = "Test"; // Setze hier das öffentliche Passwort ein
+        const PASSWORD = "geheim123"; // Das vorher mitgeteilte Passwort
         const KEYS = {
-            "Spiel 1": "ABC123-XYZ456",
-            "Spiel 2": "DEF789-UVW123",
+            game1: "KEY-FOR-GAME1-123",
+            game2: "KEY-FOR-GAME2-456",
+            game3: "KEY-FOR-GAME3-789"
         };
 
-        function checkPassword() {
-            const nickname = document.getElementById("nickname").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const spiel = document.getElementById("spiel").value;
+        const form = document.getElementById('key-form');
+        const keyContainer = document.getElementById('key-container');
+        const historyList = document.getElementById('history-list');
+        const toggleModeButton = document.getElementById('toggle-mode');
+        const body = document.body;
 
-            if (nickname === "") {
-                alert("Bitte gib deinen Namen oder Nickname ein.");
+        let isDarkMode = false;
+
+        // Wechsel zwischen Licht- und Dunkelmodus
+        toggleModeButton.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            body.className = isDarkMode ? 'dark-mode' : 'light-mode';
+            toggleModeButton.textContent = isDarkMode ? 'Wechsel zu Lichtmodus' : 'Wechsel zu Dunkelmodus';
+        });
+
+        // Form-Submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const game = document.getElementById('game-select').value;
+            const nickname = document.getElementById('nickname').value;
+            const password = document.getElementById('password').value;
+
+            if (password !== PASSWORD) {
+                alert('Falsches Passwort!');
                 return;
             }
 
-            if (password === PASSWORD) {
-                const key = KEYS[spiel];
-                document.getElementById("result").innerHTML = 
-                    `<p><strong>${spiel}</strong>: Dein Key ist <code>${key}</code></p>`;
-
-                // Automatische E-Mail senden
-                sendEmail(nickname, spiel, key);
-            } else {
-                alert("Falsches Passwort! Bitte versuche es erneut.");
+            if (!KEYS[game]) {
+                alert('Ungültiges Spiel!');
+                return;
             }
-        }
 
-        function sendEmail(nickname, spiel, key) {
-            // Daten an Formsubmit senden
-            const form = document.createElement("form");
-            form.action = "https://formsubmit.co/feho87@gmail.com"; // Ersetze mit deiner E-Mail
-            form.method = "POST";
-            form.style.display = "none";
+            const key = KEYS[game];
+            keyContainer.textContent = `Key für ${game}: ${key}`;
+            keyContainer.style.display = 'block';
 
-            // Eingabefelder hinzufügen
-            form.innerHTML = `
-                <input type="hidden" name="_subject" value="Key abgerufen!">
-                <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="nickname" value="${nickname}">
-                <input type="hidden" name="spiel" value="${spiel}">
-                <input type="hidden" name="key" value="${key}">
-            `;
+            const now = new Date();
+            const timestamp = now.toLocaleString('de-DE');
 
-            // Formular abschicken
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
-        }
+            // Historie aktualisieren
+            const historyItem = document.createElement('li');
+            historyItem.textContent = `${game} wurde von ${nickname} am ${timestamp} eingelöst.`;
+            historyList.appendChild(historyItem);
+
+            // Key löschen, damit es nicht erneut angezeigt werden kann
+            delete KEYS[game];
+            document.querySelector(`#game-select option[value="${game}"]`).textContent += " - Bereits eingelöst";
+            document.querySelector(`#game-select option[value="${game}"]`).disabled = true;
+
+            // Formular zurücksetzen
+            form.reset();
+        });
     </script>
-</head>
-<body>
-    <h1>Spiele Key Vergabe</h1>
-    <p>Wähle ein Spiel aus, gib deinen Nickname und das Passwort ein, um den Key zu sehen.</p>
-    <label for="spiel">Spiel:</label>
-    <select id="spiel">
-        <option value="Spiel 1">Spiel 1</option>
-        <option value="Spiel 2">Spiel 2</option>
-    </select><br><br>
-    <label for="nickname">Dein Nickname:</label>
-    <input type="text" id="nickname" placeholder="Nickname"><br><br>
-    <label for="password">Passwort:</label>
-    <input type="password" id="password" placeholder="Passwort"><br><br>
-    <button onclick="checkPassword()">Key anzeigen</button>
-    <div id="result" class="hidden"></div>
 </body>
 </html>
