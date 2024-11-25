@@ -115,6 +115,26 @@
             toggleModeButton.textContent = isDarkMode ? 'Wechsel zu Lichtmodus' : 'Wechsel zu Dunkelmodus';
         });
 
+        // Historie aus dem Speicher laden
+        function loadHistory() {
+            const savedHistory = JSON.parse(localStorage.getItem('keyHistory')) || [];
+            savedHistory.forEach(item => addHistoryEntry(item.game, item.nickname, item.timestamp));
+        }
+
+        // Historie in den Speicher schreiben
+        function saveHistory(game, nickname, timestamp) {
+            const savedHistory = JSON.parse(localStorage.getItem('keyHistory')) || [];
+            savedHistory.push({ game, nickname, timestamp });
+            localStorage.setItem('keyHistory', JSON.stringify(savedHistory));
+        }
+
+        // Neue Historien-Eintrag hinzufügen
+        function addHistoryEntry(game, nickname, timestamp) {
+            const historyItem = document.createElement('li');
+            historyItem.textContent = `${game} wurde von ${nickname} am ${timestamp} eingelöst.`;
+            historyList.appendChild(historyItem);
+        }
+
         // Form-Submission
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -129,7 +149,7 @@
             }
 
             if (!KEYS[game]) {
-                alert('Ungültiges Spiel!');
+                alert('Ungültiges Spiel oder bereits eingelöst!');
                 return;
             }
 
@@ -141,9 +161,8 @@
             const timestamp = now.toLocaleString('de-DE');
 
             // Historie aktualisieren
-            const historyItem = document.createElement('li');
-            historyItem.textContent = `${game} wurde von ${nickname} am ${timestamp} eingelöst.`;
-            historyList.appendChild(historyItem);
+            addHistoryEntry(game, nickname, timestamp);
+            saveHistory(game, nickname, timestamp);
 
             // Key löschen, damit es nicht erneut angezeigt werden kann
             delete KEYS[game];
@@ -153,6 +172,9 @@
             // Formular zurücksetzen
             form.reset();
         });
+
+        // Historie beim Laden der Seite anzeigen
+        loadHistory();
     </script>
 </body>
 </html>
