@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Keys für lau</title>
+    <title>Spiele Key Vergabe</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,46 +14,31 @@
             display: none;
         }
     </style>
-    <script>
-        const PASSWORD = "BockisSpieleKiste"; // Setze hier das öffentliche Passwort ein
-        const KEYS = {
-            "Spiel 1": "ABC123-XYZ456",
-            "Spiel 2": "DEF789-UVW123",
-        };
-
-        function checkPassword() {
-            const nickname = document.getElementById("nickname").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const spiel = document.getElementById("spiel").value;
-
-            if (nickname === "") {
-                alert("Bitte gib deinen Namen oder Nickname ein.");
-                return;
-            }
-
-            if (password === PASSWORD) {
-                const key = KEYS[spiel];
-                document.getElementById("result").innerHTML = 
-                    `<p><strong>${spiel}</strong>: Dein Key ist <code>${key}</code></p>`;
-            } else {
-                alert("Falsches Passwort! Bitte versuche es erneut.");
-            }
-        }
-    </script>
 </head>
 <body>
     <h1>Spiele Key Vergabe</h1>
-    <p>Wähle ein Spiel aus, gib deinen Nickname und das Passwort ein, um den Key zu sehen.</p>
-    <label for="spiel">Spiel:</label>
-    <select id="spiel">
-        <option value="Spiel 1">Spiel 1</option>
-        <option value="Spiel 2">Spiel 2</option>
-    </select><br><br>
-    <label for="nickname">Dein Nickname:</label>
-    <input type="text" id="nickname" placeholder="Nickname"><br><br>
-    <label for="password">Passwort:</label>
-    <input type="password" id="password" placeholder="Passwort"><br><br>
-    <button onclick="checkPassword()">Key anzeigen</button>
-    <div id="result" class="hidden"></div>
+    <p>Gib deinen Nickname und das Passwort ein, um den Key zu sehen. Nach dem Abruf erhältst du eine E-Mail.</p>
+    <form action="https://formsubmit.co/feho87@gmail.com" method="POST">
+        <!-- Formsubmit spezifische Felder -->
+        <input type="hidden" name="_subject" value="Key abgerufen!">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+
+        <!-- Eingabefelder -->
+        <label for="spiel">Spiel:</label>
+        <select id="spiel" name="spiel">
+            <option value="Spiel 1">Spiel 1</option>
+            <option value="Spiel 2">Spiel 2</option>
+        </select><br><br>
+
+        <label for="nickname">Dein Nickname:</label>
+        <input type="text" id="nickname" name="nickname" placeholder="Nickname" required><br><br>
+
+        <label for="password">Passwort:</label>
+        <input type="password" id="password" name="password" placeholder="Passwort" required><br><br>
+
+        <!-- Schlüsselanzeige -->
+        <button type="submit">Key anzeigen und senden</button>
+    </form>
 </body>
 </html>
